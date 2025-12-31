@@ -15,7 +15,7 @@ def main():
     checkpointer = Checkpointer(config)
     model = StockTransformer(config)
     dataset = StockDataset(config)
-    train_loader = DataLoader(
+    dataloader = DataLoader(
         dataset,
         batch_size=config.batch_size,
         num_workers=os.cpu_count() or 2
@@ -27,7 +27,7 @@ def main():
                                     betas=config.betas)
         criterion = torch.nn.MSELoss()
         model.train()
-        for inputs, targets in train_loader:
+        for inputs, targets in dataloader:
             optimizer.zero_grad()
             output = model(inputs).squeeze(1)
             loss = criterion(output, targets)
