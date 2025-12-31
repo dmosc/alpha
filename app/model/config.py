@@ -1,5 +1,8 @@
+from pathlib import Path
+
+
 class Config:
-    def __init__(self):
+    def __init__(self, data_dir: Path):
         self.epochs = 10
         self.batch_size = 32
         self.seq_len = 30
@@ -12,3 +15,4 @@ class Config:
         self.lr = 1e-3
         self.betas = (0.9, 0.98)
         self.max_norm = 1.0
+        self.data_dir = data_dir

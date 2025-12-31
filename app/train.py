@@ -1,12 +1,14 @@
 import torch
 
+from pathlib import Path
+
 from model.config import Config
 from model.stock_transformer import StockTransformer
 
 
 def main():
-    device = _init_environment()
-    config = Config()
+    device, data_dir = _init_environment()
+    config = Config(data_dir)
     model = StockTransformer(config).to(device)
     for epoch in range(config.epochs):
         print(f'{epoch=}')
@@ -32,7 +34,7 @@ def main():
         print(f'{loss=}')
 
 
-def _init_environment() -> torch.device:
+def _init_environment() -> tuple[torch.device, Path]:
     torch.manual_seed(42)
     if torch.backends.mps.is_available():
         device = torch.device('mps')
@@ -40,7 +42,8 @@ def _init_environment() -> torch.device:
     else:
         device = torch.device('cpu')
         print('Using CPU.')
-    return device
+    data_dir = Path(__file__).parent / 'data'
+    return device, data_dir
 
 
 if __name__ == '__main__':
