@@ -19,3 +19,4 @@ class Config:
         self.data_dir = data_dir
         self.training_data_dir = self.data_dir / 'tickers'
         self.training_features = ['Open', 'High', 'Low', 'Volume', 'Close']
+        self.eps = 1e-8
