@@ -7,11 +7,12 @@ from torch.utils.data import DataLoader
 from model.config import Config
 from model.stock_transformer import StockTransformer
 from model.stock_dataset import StockDataset
-
+from model.checkpointer import Checkpointer
 
 def main():
     _, data_dir = _init_environment()
     config = Config(data_dir)
+    checkpointer = Checkpointer(config)
     model = StockTransformer(config)
     dataset = StockDataset(config)
     train_loader = DataLoader(
@@ -32,6 +33,7 @@ def main():
             loss = criterion(output, targets)
             if step % config.save_every_n_steps == 0:
                 print(f'{step=}; {loss.item()=}')
+                checkpointer.save_checkpoint(model, step)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(),
                                         max_norm=config.max_norm)
