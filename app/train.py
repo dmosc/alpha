@@ -4,34 +4,30 @@ from pathlib import Path
 
 from model.config import Config
 from model.stock_transformer import StockTransformer
+from model.dataloader import DataLoader
 
 
 def main():
     device, data_dir = _init_environment()
     config = Config(data_dir)
-    model = StockTransformer(config).to(device)
+    model = StockTransformer(config)
+    dataloader = DataLoader(config)
     for epoch in range(config.epochs):
         print(f'{epoch=}')
-        input = torch.randn((config.batch_size, config.seq_len,
-                            config.input_dims)).to(device)
-        # We want to extract the last feature of the last sequence vector which
-        # contains the closing price of every day and shift that by one position to
-        # create the targets for every training example.
-        #
-        # Values for each input dimension [Open, High, Low, Volume, Close].
-        target = input[:, -1, -1].roll(shifts=-1, dims=-1).to(device)
         optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr,
                                     betas=config.betas)
         criterion = torch.nn.MSELoss()
         model.train()
-        optimizer.zero_grad()
-        output = model(input).squeeze(1)
-        loss = criterion(output, target)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(),
-                                       max_norm=config.max_norm)
-        optimizer.step()
-        print(f'{loss=}')
+        while data_paylaod := dataloader.get_next_batch():
+            batch, targets = data_paylaod
+            optimizer.zero_grad()
+            output = model(batch).squeeze(1)
+            loss = criterion(output, targets)
+            print(f'{loss.item()=}')
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(),
+                                        max_norm=config.max_norm)
+            optimizer.step()
 
 
 def _init_environment() -> tuple[torch.device, Path]:

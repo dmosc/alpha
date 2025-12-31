@@ -3,9 +3,10 @@ from pathlib import Path
 
 class Config:
     def __init__(self, data_dir: Path):
+        self.ticker = 'SPY'
         self.epochs = 10
-        self.batch_size = 32
-        self.seq_len = 30
+        self.batch_size = 16
+        self.seq_len = 5
         self.input_dims = 5
         self.d_model = 150
         self.dropout = 0.1
@@ -16,3 +17,5 @@ class Config:
         self.betas = (0.9, 0.98)
         self.max_norm = 1.0
         self.data_dir = data_dir
+        self.training_data_dir = self.data_dir / 'tickers'
+        self.training_features = ['Open', 'High', 'Low', 'Volume', 'Close']
