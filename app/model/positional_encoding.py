@@ -23,6 +23,5 @@ class PositionalEncoding(torch.nn.Module):
         :return: Output tensor with positional encoding applied.
         :rtype: Tensor
         """
-        print(f"{input.shape=} {self.positional_encoding.shape=}")
         input = input + self.positional_encoding[:, :input.size(1)]
         return self.dropout(input)
