@@ -19,6 +19,7 @@ class Config:
         self.data_dir = data_dir
         self.training_data_dir = self.data_dir / 'tickers'
         self.models_dir = self.data_dir / 'models'
-        self.training_features = ['Open', 'High', 'Low', 'Volume', 'Close']
+        self.training_features = ['Open', 'High', 'Low', 'Close', 'Volume',
+                                  'LogReturn']
         self.eps = 1e-8
         self.save_every_n_steps = 1_000

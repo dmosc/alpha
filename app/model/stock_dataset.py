@@ -1,5 +1,6 @@
 import torch
 import pandas as pd
+import numpy as np
 
 from torch.utils.data import Dataset
 
@@ -11,9 +12,11 @@ class StockDataset(Dataset):
         self.config = config
         paths = sorted(config.training_data_dir.glob(f"{config.ticker}_*.csv"))
         dataframe = pd.concat([pd.read_csv(p) for p in paths])
+        dataframe['LogReturn'] = np.log(
+            dataframe['Close'] / dataframe['Close'].shift(1))
         self.data = torch.tensor(dataframe[config.training_features].values,
                                  dtype=torch.float)
-        self.targe_idx = config.training_features.index('Close')
+        self.targe_idx = config.training_features.index('LogReturn')
 
     def __len__(self):
         return len(self.data) - self.config.seq_len
