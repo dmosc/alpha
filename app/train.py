@@ -2,12 +2,13 @@ import torch
 import os
 
 from pathlib import Path
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 from model.config import Config
 from model.stock_transformer import StockTransformer
 from model.stock_dataset import StockDataset
 from model.checkpointer import Checkpointer
+
 
 def main():
     _, data_dir = _init_environment()
@@ -15,11 +16,13 @@ def main():
     checkpointer = Checkpointer(config)
     model = StockTransformer(config)
     dataset = StockDataset(config)
-    dataloader = DataLoader(
-        dataset,
-        batch_size=config.batch_size,
-        num_workers=os.cpu_count() or 2
-    )
+    train_dataloader, test_dataloader = _get_train_test_dataloaders(config,
+                                                                    dataset)
+    train_model(config, checkpointer, model, train_dataloader)
+
+
+def train_model(config: Config, checkpointer: Checkpointer,
+                model: StockTransformer, dataloader: DataLoader):
     step = 0
     for epoch in range(config.epochs):
         print(f'{epoch=}')
@@ -40,6 +43,24 @@ def main():
             optimizer.step()
             step += 1
 
+def _get_train_test_dataloaders(config: Config, dataset: StockDataset):
+    train_dataset_len = int(len(dataset) * 0.8)
+    test_dataset_len = len(dataset) - train_dataset_len
+    num_workers = os.cpu_count() or 2
+    train_dataset = torch.utils.data.Subset(dataset, range(train_dataset_len))
+    test_dataset = torch.utils.data.Subset(dataset, range(train_dataset_len,
+                                                          train_dataset_len + test_dataset_len))
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=config.batch_size,
+        num_workers=num_workers
+    )
+    test_dataloader = DataLoader(
+        test_dataset,
+        batch_size=config.batch_size,
+        num_workers=num_workers
+    )
+    return train_dataloader, test_dataloader
 
 def _init_environment() -> tuple[torch.device, Path]:
     torch.manual_seed(42)
