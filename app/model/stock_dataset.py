@@ -14,14 +14,14 @@ class StockDataset(Dataset):
         dataframe = pd.concat([pd.read_csv(p) for p in paths])
         dataframe['LogReturn'] = np.log(
             dataframe['Close'] / dataframe['Close'].shift(1))
+        dataframe.loc[0, 'LogReturn'] = 0
         self.data = torch.tensor(dataframe[config.training_features].values,
                                  dtype=torch.float)
-        self.targe_idx = config.training_features.index('LogReturn')
 
     def __len__(self):
         return len(self.data) - self.config.seq_len
 
     def __getitem__(self, idx):
         input = self.data[idx : idx + self.config.seq_len]
-        target = self.data[idx + self.config.seq_len, self.targe_idx]
+        target = self.data[idx + self.config.seq_len, self.config.target_idx]
         return input, target

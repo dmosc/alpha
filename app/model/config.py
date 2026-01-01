@@ -7,7 +7,10 @@ class Config:
         self.epochs = 10
         self.batch_size = 16
         self.seq_len = 5
-        self.input_dims = 5
+        self.training_features = ['Open', 'High', 'Low', 'Close', 'Volume',
+                                  'LogReturn']
+        self.input_dims = len(self.training_features)
+        self.target_idx = self.training_features.index('LogReturn')
         self.d_model = 150
         self.dropout = 0.1
         self.n_heads = 10
@@ -19,8 +22,6 @@ class Config:
         self.data_dir = data_dir
         self.training_data_dir = self.data_dir / 'tickers'
         self.models_dir = self.data_dir / 'models'
-        self.training_features = ['Open', 'High', 'Low', 'Close', 'Volume',
-                                  'LogReturn']
         self.eps = 1e-8
         self.save_every_n_steps = 1_000
     
