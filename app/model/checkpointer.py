@@ -14,7 +14,7 @@ class Checkpointer:
         model_path = self.config.models_dir / str(step) / f'{self.config.ticker}.pkl'
         model_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
-            'model_state_dict': model.state_dict(),
+            'model': model.state_dict(),
             'config': self.config.__dict__,
             'step': step
         }, model_path)
@@ -30,7 +30,7 @@ class Checkpointer:
         for key, value in config_dict.items():
             setattr(config, key, value)
         model = StockTransformer(config)
-        model.load_state_dict(checkpoint['model_state_dict'])
+        model.load_state_dict(checkpoint['model'])
         step = checkpoint['step']
         print(f'Model loaded from {checkpoint_path}')
         return model, config, step
