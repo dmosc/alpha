@@ -23,3 +23,6 @@ class Config:
                                   'LogReturn']
         self.eps = 1e-8
         self.save_every_n_steps = 1_000
+    
+    def state_dict(self):
+        return self.__dict__

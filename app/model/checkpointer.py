@@ -15,7 +15,7 @@ class Checkpointer:
         model_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             'model': model.state_dict(),
-            'config': self.config.__dict__,
+            'config': self.config.state_dict(),
             'step': step
         }, model_path)
         print(f'Model saved to {model_path}')
