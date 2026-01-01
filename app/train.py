@@ -2,7 +2,7 @@ import torch
 import os
 
 from pathlib import Path
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 
 from model.config import Config
 from model.stock_transformer import StockTransformer
@@ -16,19 +16,21 @@ def main():
     checkpointer = Checkpointer(config)
     model = StockTransformer(config)
     dataset = StockDataset(config)
+    criterion = torch.nn.MSELoss()
     train_dataloader, test_dataloader = _get_train_test_dataloaders(config,
                                                                     dataset)
-    train_model(config, checkpointer, model, train_dataloader)
+    train_model(config, checkpointer, model, train_dataloader, criterion)
+    evaluate_model(model, test_dataloader, criterion)
 
 
 def train_model(config: Config, checkpointer: Checkpointer,
-                model: StockTransformer, dataloader: DataLoader):
+                model: StockTransformer, dataloader: DataLoader,
+                criterion: torch.nn.MSELoss):
     step = 0
     for epoch in range(config.epochs):
         print(f'{epoch=}')
         optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr,
                                     betas=config.betas)
-        criterion = torch.nn.MSELoss()
         model.train()
         for inputs, targets in dataloader:
             optimizer.zero_grad()
@@ -42,6 +44,17 @@ def train_model(config: Config, checkpointer: Checkpointer,
                                         max_norm=config.max_norm)
             optimizer.step()
             step += 1
+
+
+def evaluate_model(model: StockTransformer, dataloader: DataLoader,
+                   criterion: torch.nn.MSELoss):
+    model.eval()
+    test_loss = 0
+    with torch.no_grad():
+        for inputs, targets in dataloader:
+            test_loss += criterion(model(inputs).squeeze(1), targets).item()
+    print(f'Test loss: {test_loss / len(dataloader):0.6f}')
+
 
 def _get_train_test_dataloaders(config: Config, dataset: StockDataset):
     train_dataset_len = int(len(dataset) * 0.8)
