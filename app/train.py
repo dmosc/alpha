@@ -1,3 +1,5 @@
+from wakepy import keep
+
 from model.stock_transformer import StockTransformer
 from model.checkpointer import Checkpointer
 from model.config import Config
@@ -14,5 +16,6 @@ if __name__ == '__main__':
         step = 0
         config = Config(env.data_dir)
         model = StockTransformer(config)
-    trainer = Trainer(config)
-    trainer.train(model, step)
+    with keep.presenting():
+        trainer = Trainer(config)
+        trainer.train(model, step)
