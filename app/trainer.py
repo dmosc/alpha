@@ -16,7 +16,6 @@ class Trainer:
     def train(self, model: StockTransformer, step: int = 0):
         model.train()
         checkpointer = Checkpointer(self.config)
-        criterion = torch.nn.MSELoss()
         train_dataloader, test_dataloader = self._get_train_test_dataloaders()
         for epoch in range(self.config.epochs):
             print(f'{epoch=}')
@@ -25,7 +24,7 @@ class Trainer:
             for inputs, targets in train_dataloader:
                 optimizer.zero_grad()
                 output = model(inputs).squeeze(1)
-                loss = criterion(output, targets)
+                loss = self.config.criterion(output, targets)
                 if step % 100 == 0:
                     print(f'{step=}; {loss.item()=}')
                 loss.backward()
@@ -34,15 +33,15 @@ class Trainer:
                 optimizer.step()
                 step += 1
             checkpointer.save_checkpoint(model, step)
-        self._evaluate_model(model, test_dataloader, criterion)
+        self._evaluate_model(model, test_dataloader)
     
-    def _evaluate_model(self, model: StockTransformer, dataloader: DataLoader,
-                        criterion: torch.nn.MSELoss):
+    def _evaluate_model(self, model: StockTransformer, dataloader: DataLoader):
         model.eval()
         test_loss = 0
         with torch.no_grad():
             for inputs, targets in dataloader:
-                test_loss += criterion(model(inputs).squeeze(1), targets).item()
+                test_loss += self.config.criterion(model(inputs).squeeze(1),
+                                                   targets).item()
         print(f'Test loss: {test_loss / len(dataloader):0.6f}')
     
     def _get_train_test_dataloaders(self):

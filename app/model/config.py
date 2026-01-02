@@ -1,3 +1,5 @@
+import torch
+
 from pathlib import Path
 
 
@@ -24,6 +26,7 @@ class Config:
         self.models_dir = self.data_dir / 'models'
         self.state_file = 'state.pkl'
         self.eps = 1e-8
+        self.criterion = torch.nn.MSELoss()
     
     def state_dict(self):
         return self.__dict__
