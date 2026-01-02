@@ -22,6 +22,7 @@ class Config:
         self.data_dir = data_dir
         self.training_data_dir = self.data_dir / 'tickers'
         self.models_dir = self.data_dir / 'models'
+        self.state_file = 'state.pkl'
         self.eps = 1e-8
     
     def state_dict(self):

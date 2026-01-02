@@ -14,8 +14,8 @@ class Checkpointer:
     def save_checkpoint(self, model: StockTransformer, step: int):
         total_params = sum(p.numel()
                            for p in model.parameters() if p.requires_grad)
-        model_specs = f'{numerize.numerize(total_params)}_{numerize.numerize(self.config.seq_len)}'
-        model_path = self.config.models_dir/ model_specs / str(step) / f'{self.config.ticker}.pkl'
+        model_specs = f'{self.config.ticker}_{numerize.numerize(total_params)}_{numerize.numerize(self.config.seq_len)}'
+        model_path = self.config.models_dir/ model_specs / str(step) / self.config.state_file
         model_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             'model': model.state_dict(),
