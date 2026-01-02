@@ -26,12 +26,12 @@ def main():
 def train_model(config: Config, checkpointer: Checkpointer,
                 model: StockTransformer, dataloader: DataLoader,
                 criterion: torch.nn.MSELoss):
+    model.train()
     step = 0
     for epoch in range(config.epochs):
         print(f'{epoch=}')
         optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr,
                                     betas=config.betas)
-        model.train()
         for inputs, targets in dataloader:
             optimizer.zero_grad()
             output = model(inputs).squeeze(1)
