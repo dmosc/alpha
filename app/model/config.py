@@ -6,7 +6,7 @@ class Config:
         self.ticker = 'SPY'
         self.epochs = 10
         self.batch_size = 16
-        self.seq_len = 5
+        self.seq_len = 60
         self.training_features = ['Open', 'High', 'Low', 'Close', 'Volume',
                                   'LogReturn']
         self.input_dims = len(self.training_features)
