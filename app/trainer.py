@@ -1,7 +1,6 @@
 import torch
 import os
 
-from pathlib import Path
 from torch.utils.data import DataLoader
 
 from model.config import Config
@@ -14,13 +13,11 @@ class Trainer:
     def __init__(self, config: Config):
         self.config = config
 
-    def train(self):
+    def train(self, model: StockTransformer, step: int = 0):
+        model.train()
         checkpointer = Checkpointer(self.config)
-        model = StockTransformer(self.config)
         criterion = torch.nn.MSELoss()
         train_dataloader, test_dataloader = self._get_train_test_dataloaders()
-        model.train()
-        step = 0
         for epoch in range(self.config.epochs):
             print(f'{epoch=}')
             optimizer = torch.optim.AdamW(model.parameters(), lr=self.config.lr,
