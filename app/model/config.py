@@ -18,7 +18,7 @@ class Config:
         self.n_heads = 10
         self.d_ff = int(8 / 3) * self.d_model
         self.num_layers = 5
-        self.lr = 1e-3
+        self.lr = 1e-5
         self.betas = (0.9, 0.98)
         self.max_norm = 1.0
         self.data_dir = data_dir
