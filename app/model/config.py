@@ -23,7 +23,6 @@ class Config:
         self.training_data_dir = self.data_dir / 'tickers'
         self.models_dir = self.data_dir / 'models'
         self.eps = 1e-8
-        self.save_every_n_steps = 1_000
     
     def state_dict(self):
         return self.__dict__

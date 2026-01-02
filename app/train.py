@@ -36,14 +36,14 @@ def train_model(config: Config, checkpointer: Checkpointer,
             optimizer.zero_grad()
             output = model(inputs).squeeze(1)
             loss = criterion(output, targets)
-            if step % config.save_every_n_steps == 0:
+            if step % 100 == 0:
                 print(f'{step=}; {loss.item()=}')
-                checkpointer.save_checkpoint(model, step)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(),
                                         max_norm=config.max_norm)
             optimizer.step()
             step += 1
+        checkpointer.save_checkpoint(model, step)
 
 
 def evaluate_model(model: StockTransformer, dataloader: DataLoader,
