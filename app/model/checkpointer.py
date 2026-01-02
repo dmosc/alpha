@@ -1,6 +1,7 @@
 import torch
 
 from pathlib import Path
+from numerize import numerize
 
 from .config import Config
 from .stock_transformer import StockTransformer
@@ -11,7 +12,10 @@ class Checkpointer:
         self.config = config
     
     def save_checkpoint(self, model: StockTransformer, step: int):
-        model_path = self.config.models_dir / str(step) / f'{self.config.ticker}.pkl'
+        total_params = sum(p.numel()
+                           for p in model.parameters() if p.requires_grad)
+        model_specs = f'{numerize.numerize(total_params)}_{numerize.numerize(self.config.seq_len)}'
+        model_path = self.config.models_dir/ model_specs / str(step) / f'{self.config.ticker}.pkl'
         model_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             'model': model.state_dict(),
@@ -19,7 +23,7 @@ class Checkpointer:
             'step': step
         }, model_path)
         print(f'Model saved to {model_path}')
-    
+
     @staticmethod
     def load_checkpoint(checkpoint_path: Path) -> tuple[StockTransformer, Config, int]:
         """Load model, config, and step from a checkpoint file."""
