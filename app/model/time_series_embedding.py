@@ -9,6 +9,7 @@ class TimeSeriesEmbedding(torch.nn.Module):
         self.config = config
         self.feature_projection = torch.nn.Linear(config.input_dims,
                                                   config.d_model)
+        self.layer_norm = torch.nn.LayerNorm(config.d_model)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -17,4 +18,4 @@ class TimeSeriesEmbedding(torch.nn.Module):
         :rtype: Tensor
         """
         assert input.shape[-1] == self.config.input_dims
-        return self.feature_projection(input)
+        return self.layer_norm(self.feature_projection(input))
