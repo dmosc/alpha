@@ -23,8 +23,24 @@ class StockDataset(Dataset):
         return input, target
 
     def _apply_transformations(self, dataframe: pd.DataFrame) -> torch.Tensor:
+        dataframe = self._add_moving_average_cols(dataframe)
+        dataframe = self._add_log_return_col(dataframe)
+        return torch.tensor(dataframe[self.config.training_features].values,
+                                 dtype=torch.float)
+    
+    def _add_log_return_col(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         dataframe['LogReturn'] = np.log(
             dataframe['Close'] / dataframe['Close'].shift(1))
         dataframe.loc[0, 'LogReturn'] = 0
-        return torch.tensor(dataframe[self.config.training_features].values,
-                                 dtype=torch.float)
+        return dataframe
+    
+    def _add_moving_average_cols(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+        dataframe['MA_8'] = dataframe['Close'].rolling(window=8,
+                                                       min_periods=1).mean()
+        dataframe['MA_20'] = dataframe['Close'].rolling(window=20,
+                                                        min_periods=1).mean()
+        dataframe['MA_50'] = dataframe['Close'].rolling(window=50,
+                                                        min_periods=1).mean()
+        dataframe['MA_200'] = dataframe['Close'].rolling(window=200,
+                                                        min_periods=1).mean()
+        return dataframe
